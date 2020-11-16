@@ -1,0 +1,638 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>Cool stuff with ansible</title>
+
+  <link rel="stylesheet" href="dist/reset.css">
+  <link rel="stylesheet" href="dist/reveal.css">
+  <link rel="stylesheet" href="dist/theme/black.css" id="theme">
+
+  <!-- Theme used for syntax highlighted code -->
+  <link rel="stylesheet" href="plugin/highlight/tomorrow-night.css" id="highlight-theme">
+</head>
+
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section>
+        <video class="r-stretch r-frame" data-autoplay src="resources/intro.mp4"></video>
+      </section> 
+
+      <!-- Title section -->
+      <section data-background-image="resources/Ansible-Mark-RGB_Outline-White.svg" data-background-size="60%"
+        data-background-opacity="0.05">
+        <h2>Cool stuff with</h1>
+          <img data-src="resources/Ansible-Wordmark-RGB-White.svg">
+          <h3>by badgateway</h3>
+      
+          <aside class="notes">
+            Shhh, these are your private notes 📝
+          </aside>
+
+        </section>
+
+      <!-- Über den Vortrag-->
+      <section data-background-image="resources/Ansible-Mark-RGB_Outline-White.svg" data-background-size="60%"
+        data-background-opacity="0.05">
+        <section>
+          <h2 class="r-fit-text">Über den Vortrag</h2>
+        </section>
+        <section>
+          <p><em>„Was passiert hier?”</em></p>
+          <p class="fragment"><em>„Was ist Ansible?”</em></p>
+          <p class="fragment">Konzepte & Komponenten</p>
+          <p class="fragment">Ausgewählte Tools des Ökosystems</p>
+          <p class="fragment"><strong>Demos!</strong></p>
+        </section>
+      </section>
+
+      <!-- Über den Vortragenden-->
+      <section data-background-image="resources/katzenlogo_271020.svg" data-background-size="60%"
+        data-background-opacity="0.05">
+        <section>
+          <h2 class="r-fit-text">Über mich</h2>
+        </section>
+        <section>
+          <p>badgateway</p>
+          <p class="fragment">Informatik, Werkstudent, Labormitglied</p>
+          <p class="fragment">Infrastruktur, Networking, Python</p>
+        </section>
+      </section>
+
+      <!-- Über Ansible-->
+      <section data-background-image="resources/Ansible-Mark-RGB_Outline-White.svg" data-background-size="60%"
+        data-background-opacity="0.05">
+        <section>
+          <h2 class="r-fit-text">Über Ansible</h2>
+        </section>
+
+        <section>
+          <h2>„Was ist Ansible?“</h2>
+          <p class="fragment">Automatisierungstool</p>
+          <p class="fragment">Python-Skript</p>
+          <p class="fragment">Ökosystem</p>
+          <p class="fragment">Die größte Zeitersparnis seit der Erfindung von Schuhen mit Klettverschluss</p>
+        </section>
+
+        <section>
+          <h2>„Welche Probleme löst Ansible?”</h2>
+          <p class="fragment"><em>a.k.a. Warum brauche ich das?</em></p>
+          <p class="fragment"><em>Infrastructure as code</em></p>
+          <p class="fragment">Reproduzierbarkeit</p>
+          <p class="fragment">Parallelisierbarkeit</p>
+          <p class="fragment"><em>Pets vs. <strong>Cattle</strong></em></p>
+          <p class="fragment">Entkopplung von Fähigkeiten</p>
+        </section>
+
+        <section>
+          <h2>„Wie löst Ansible Probleme?”</h2>
+          <p class="fragment"><em>a.k.a. Buzzword-Bingo</em></p>
+          <p class="fragment"><em>agent-less</em><span class="fragment"> (SSH)</span></p>
+          <p class="fragment"><em>declarative</em></p>
+          <p class="fragment"><em>idempotent</em></p>
+          <p class="fragment"><em>modular</em></p>
+          <p class="fragment">Mit lustigen Sportmetaphern</p>
+        </section>
+
+        <section>
+          <h2>„Was brauche ich dafür?”</h2>
+          <p class="fragment">Linux, MacOS, BSD, - unixoid</p>
+          <p class="fragment">SSH</p>
+          <p class="fragment">Python (2 oder 3)</p>
+          <p class="fragment">Installation via Paketmanager oder Pip</p>
+        </section>
+      </section>
+
+      <!-- YAML & Jinja2 -->
+      <section data-background-image="resources/Ansible-Mark-RGB_Outline-White.svg" data-background-size="60%"
+        data-background-opacity="0.05">
+        <section>
+          <h2 class="r-fit-text">Exkurs: YAML & Jinja2</h2>
+        </section>
+        <section>
+          <h2>YAML</h2>
+          <p class="fragment">„Yet Another Markup Language”</p>
+          <p class="fragment">Textformat in Ansible</p>
+        </section>
+        <section>
+          <h2>YAML</h2>
+          <pre><code data-line-numbers="*|1|2|4-6|5-6|9-13|10-13|*">---
+# tasks file for bootstrap
+- name: wait for host
+  wait_for:
+    port: "{{ ansible_port }}"
+    host: "{{ (ansible_ssh_host }}"
+  connection: local
+  become: no
+  when:
+    - ansible_connection is defined
+    - ansible_connection != "docker"
+    - ansible_connection != "container"
+    - bootstrap_wait_for_host | bool
+					</code></pre>
+        </section>
+
+        <section>
+          <h2>Jinja2</h2>
+          <p class="fragment">Templating Language</p>
+          <span class="fragment">
+            <p>In kurz:</p>
+            <pre><code data-line-numbers>                   "Hello, {{ name }}!"</code></pre>
+          </span>
+        </section>
+      </section>
+
+      <!-- Konzepte & Komponenten -->
+      <section data-background-image="resources/Ansible-Mark-RGB_Outline-White.svg" data-background-size="60%"
+        data-background-opacity="0.05">
+        <section>
+          <h2 class="r-fit-text">Konzepte & Komponenten</h2>
+        </section>
+      </section>
+
+      <!-- Inventar -->
+      <section data-background-image="resources/Ansible-Mark-RGB_Outline-White.svg" data-background-size="60%"
+        data-background-opacity="0.05">
+        <section>
+          <h2>Konzepte & Komponenten</h2>
+          <p class="fragment grow highlight-red">Inventar</p>
+          <p>Module</p>
+          <p>Tasks</p>
+          <p>Plays</p>
+          <p>Ad-Hoc</p>
+          <p>Playbooks</p>
+          <p>Roles</p>
+        </section>
+
+        <section>
+          <h2>Inventar</h2>
+          <p class="fragment">YAML- oder INI-File der von Ansible verwalteten Hosts</p>
+          <p class="fragment">Hosts können beliebig vielen Gruppen zugeordnet werden</p>
+          <p class="fragment">Gruppen können Elemente anderer Gruppen sein</p>
+          <p class="fragment">Hosts und/oder Gruppen werden über Variablen beliebige Werte zugewiesen</p>
+        </section>
+
+        <!-- https://tools.ietf.org/html/rfc5737 -->
+        <section>
+          <h2>Inventar</h2>
+          <p>Beispiel Inventar #1</p>
+          <pre><code data-line-numbers="*|1,5,15|1-3|5-6|8|1,5,8-10|8,12-13|*">[testing]
+192.0.2.13
+192.0.2.37
+
+[staging]
+198.51.100.210
+
+[non-prod:children]
+testing
+staging
+
+[non-prod:vars]
+abc = "def"
+
+[production]
+203.0.113.123
+
+[production:vars]
+abc = "xyz"
+			</code></pre>
+        </section>
+
+        <section>
+          <h2>Inventar</h2>
+          <p>Beispiel Inventar #2</p>
+          <pre><code data-line-numbers="*|2-9|10-15|3|3-7|5|5-7|8|8-9|*">---
+webservers:
+  hosts:
+    web_prod:
+    web_dev:
+      ansible_port: 5555
+      ansible_host: 192.0.2.50
+  vars:
+    is_webserver: "true"
+dbservers:
+  hosts:
+    db_prod:
+    db_dev:
+  vars:
+    is_webserver: "false"
+				</code></pre>
+        </section>
+
+        <section>
+          <h2>Inventar</h2>
+          <p>Dynamisches Inventar</p>
+          <p class="fragment">Quelle: CMDB, IPAM, DCIM, $CloudProvider</p>
+          <p class="fragment">z.B. für <a href="https://docs.ansible.com/ansible/latest/collections/hetzner/hcloud/hcloud_inventory.html">Hetzner Cloud</a></p>
+        </section>
+      </section>
+
+      <!-- Module -->
+      <section data-background-image="resources/Ansible-Mark-RGB_Outline-White.svg" data-background-size="60%"
+        data-background-opacity="0.05">
+        <section>
+          <h2>Konzepte & Komponenten</h2>
+          <p>Inventar</p>
+          <p class="fragment grow highlight-red">Module</p>
+          <p>Tasks</p>
+          <p>Plays</p>
+          <p>Ad-Hoc</p>
+          <p>Playbooks</p>
+          <p>Roles</p>
+        </section>
+
+        <section>
+          <h2>Module</h2>
+          <p class="fragment">Implementierung der eigentlichen Funktionalität</p>
+          <p class="fragment">Werden durch Ansible auf dem verwalteten Host ausgeführt</p>
+          <p class="fragment">Pythonskripte die nach Ausführung JSON zurückliefern</p>
+        </section>
+
+        <section>
+          <a href="https://docs.ansible.com/ansible/latest/collections/ansible/builtin/ping_module.html">Ping Modul</a>
+          <pre><code data-line-numbers="*|1|2-8|*">ansible -m ping -i hosts some-host
+some-host | SUCCESS => {
+	"ansible_facts": {
+		"discovered_interpreter_python": "/usr/bin/python"
+	},
+	"changed": false,
+	"ping": "pong"
+}
+				</code></pre>
+        </section>
+
+
+        <section>
+          <h2>Facts</h2>
+          <p class="fragment">Ansible ermittelt Informationen über den Ist-Zustand des Hosts</p>
+          <p class="fragment">Werden implizit vor dem erstem Task ermittelt</p>
+          <p class="fragment">Können wie Variablen verwendet werden</p>
+          <p class="fragment">Können durch 'gather_facts' oder das 'setup'-Modul gesteuert werden</p>
+        </section>
+
+        <section>
+          <a href="https://docs.ansible.com/ansible/latest/collections/ansible/builtin/ping_module.html">Ping Modul</a>
+          <pre><code data-line-numbers="*|3-4|*">---
+- name: "Test connection to host"
+  ping:
+    data: pong
+				</code></pre>
+        </section>
+
+        <section>
+          <p>Exkurs: <a href="https://github.com/ansible/ansible/blob/devel/lib/ansible/modules/ping.py">Ping Modul - Source</a></p>
+          <pre><code data-line-numbers="*|1|3|4-12|17-19|21|*">from ansible.module_utils.basic import AnsibleModule
+
+def main():
+  module = AnsibleModule(
+    argument_spec={
+      'data': {
+        'type': 'str',
+        'default': 'pong'
+      }
+    },
+    supports_check_mode=True
+  )
+
+  if module.params['data'] == 'crash':
+    raise Exception("boom")
+
+  result = {
+    'ping': module.params['data'],
+  }
+
+  module.exit_json(**result)
+      </code></pre>
+        </section>
+
+        <!-- <section>
+          <a href=".">XYZ Modul</a>
+          <p>Ein weiteres Beispiel bitte</p>
+        </section> -->
+      </section>
+
+
+      <!-- Tasks -->
+      <section data-background-image="resources/Ansible-Mark-RGB_Outline-White.svg" data-background-size="60%"
+        data-background-opacity="0.05">
+        <section>
+          <h2>Konzepte & Komponenten</h2>
+          <p>Inventar</p>
+          <p>Module</p>
+          <p class="fragment grow highlight-red">Tasks</p>
+          <p>Plays</p>
+          <p>Ad-Hoc</p>
+          <p>Playbooks</p>
+          <p>Roles</p>
+        </section>
+
+        <section>
+          <h2>Tasks</h2>
+          <p>Ausführbare Einheiten, bestehend aus:</p>
+          <ul>
+            <li class="fragment">
+              <p>Namen</p>
+            </li>
+            <li class="fragment">
+              <p>Modul samt Parametern</p>
+            </li>
+            <li class="fragment">
+              <p>zusätzlichen Keywords zur Konfiguration der Ausführung</p>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Tasks</h2>
+          <pre><code data-line-numbers="*|2|4-9|3,10-13|*">---
+- name: "Copy config to server"
+  become: yes
+  copy:
+    dest: "/etc/server/server.config"
+    src: "filename.conf"
+    group: root 
+    mode: 0644
+    owner: root
+  when:
+    - ansible_distribution != "CentOS"
+  notify:
+    - "Reload server"</code></pre>
+      </section>
+    </section>
+
+    <!-- Plays -->
+    <section data-background-image="resources/Ansible-Mark-RGB_Outline-White.svg" data-background-size="60%"
+        data-background-opacity="0.05">
+        <section>
+          <h2>Konzepte & Komponenten</h2>
+          <p>Inventar</p>
+          <p>Module</p>
+          <p>Tasks</p>
+          <p class="fragment grow highlight-red">Plays</p>
+          <p>Ad-Hoc</p>
+          <p>Playbooks</p>
+          <p>Roles</p>
+        </section>
+
+        <section>
+          <h2>Plays</h2>
+          <p class="fragment"><em>„Mapping einer Menge von Hosts auf eine Menge von Tasks”</em></p>
+          <p class="fragment"><em>Das, was Ansible “macht”</em></p>
+          <p class="fragment">Sportmetapher</p>
+        </section>
+      </section>
+
+
+      <!-- Ad-Hoc -->
+      <section data-background-image="resources/Ansible-Mark-RGB_Outline-White.svg" data-background-size="60%"
+        data-background-opacity="0.05">
+        <section>
+          <h2>Konzepte & Komponenten</h2>
+          <p>Inventar</p>
+          <p>Module</p>
+          <p>Tasks</p>
+          <p>Plays</p>
+          <p class="fragment grow highlight-red">Ad-Hoc</p>
+          <p>Playbooks</p>
+          <p>Roles</p>
+        </section>
+
+        <section>
+          <h2>Ad-Hoc</h2>
+          <p class="fragment">„Quick & Dirty”-Mode</p>
+          <p class="fragment"><em>„Ich update mal eben die 879 Hosts der beiden Rechenzentren”</em></p>
+          <pre class="fragment"><code data-line-numbers="*|1|2-8|*">ansible -i hosts -m ping some-host
+some-host | SUCCESS => {
+  "ansible_facts": {
+    "discovered_interpreter_python": "/usr/bin/python"
+  },
+  "changed": false,
+  "ping": "pong"
+}
+                    </code></pre>
+        </section>
+      </section>
+
+
+
+      <!-- Ad-Hoc -->
+      <section data-background-image="resources/Ansible-Mark-RGB_Outline-White.svg" data-background-size="60%"
+        data-background-opacity="0.05">
+        <section>
+          <h2>Konzepte & Komponenten</h2>
+          <p>Inventar</p>
+          <p>Module</p>
+          <p>Tasks</p>
+          <p>Plays</p>
+          <p>Ad-Hoc</p>
+          <p class="fragment grow highlight-red">Playbooks</p>
+          <p>Roles</p>
+        </section>
+
+        <section>
+          <h2>Playbooks</h2>
+          <p class="fragment">Orchestrations-Sprache</p>
+          <p class="fragment">Ansible „Skript”</p>
+          <p class="fragment">Führt Liste von Plays aus</p>
+        </section>
+
+        <section>
+          <h2>Playbooks</h2>
+          <pre><code data-line-numbers="*|1|2-8|10-25|27-31|2|3-5|6|7|8|10-13|15-20|19-20|28-31|22-25|*">---
+- hosts: webservers
+  vars:
+    http_port: 80
+    max_clients: 200
+  remote_user: "root"
+  become: no
+  tasks:
+
+  - name: "Update apache to latest version"
+    yum:
+      name: httpd
+      state: latest
+
+  - name: "Write apache config file"
+    template:
+      src: "/srv/httpd.j2"
+      dest: "/etc/httpd.conf"
+    notify:
+    - Restart apache
+
+  - name: "Make sure apache is running"
+    service:
+      name: httpd
+      state: started
+
+  handlers:
+    - name: "Restart apache"
+      service:
+        name: httpd
+        state: restarted
+          </code></pre>
+        </section>
+
+      </section>
+
+
+      <!-- Roles -->
+      <section data-background-image="resources/Ansible-Mark-RGB_Outline-White.svg" data-background-size="60%"
+        data-background-opacity="0.05">
+        <section>
+          <h2>Konzepte & Komponenten</h2>
+          <p>Inventar</p>
+          <p>Module</p>
+          <p>Tasks</p>
+          <p>Plays</p>
+          <p>Ad-Hoc</p>
+          <p>Playbooks</p>
+          <p class="fragment grow highlight-red">Roles</p>
+        </section>
+
+      <section>
+        <h2>Roles</h2>
+        <p class="fragment">Organisationseinheiten</p>
+        <p class="fragment">Festgelegte Ordnerstruktur</p>
+        <p class="fragment">Implementieren bestimmtes Verhalten</p>
+        <p class="fragment"><em>„Der Host hat die Rolle eines Webservers”</em></p>
+      </section>
+
+      <section>
+        <h2>Roles</h2>
+        <p>Ordnerstruktur:</p>
+        <ul>
+          <li class="fragment">defaults</li>
+          <li class="fragment">files</li>
+          <li class="fragment">handlers</li>
+          <li class="fragment">meta</li>
+          <li class="fragment"><strong class="fragment highlight-red">tasks</strong></li>
+          <li class="fragment">templates</li>
+          <li class="fragment">vars</li>
+        </ul>
+      </section>
+
+      <section>
+      <h2>Roles</h2>
+      <p><strong>It's demo time!</strong></p>
+      </section>
+
+      <section>
+        <h2>Roles</h2>
+        <p><em>Oder doch nicht?!</em></p>
+      </section>
+
+      </section>
+
+
+      <!-- Ansible Ökosystem -->
+      <section data-background-image="resources/Ansible-Mark-RGB_Outline-White.svg" data-background-size="60%"
+        data-background-opacity="0.05">
+        <section>
+          <h2 class="r-fit-text">Ansible Ökosystem</h2>
+        </section>
+
+        <section>
+          <h2>Ansible Vault</h2>
+          <p class="fragment">AES-verschlüsseltes YAML File</p>
+          <p class="fragment">Kann sensitive Variablen speichern und trotzdem im Git eingecheckt werden</p>
+          <p class="fragment">Kann als eigenständiges Vault-File oder inline als Wert von regulären Variablen verwendet werden</p>
+          <pre class="fragment"><code>          ansible-vault {create|edit} foo_vault.yml</code></pre>
+        </section>
+
+        <section>
+          <h2>Ansible Lint</h2>
+          <p class="fragment">Linter für Ansible Playbooks</p>
+          <pre class="fragment"><code>           ansible-lint dev-playbook.yml -x 701,703</code></pre>
+        </section>
+
+        <section>
+          <h2>Ansible Molecule</h2>
+          <p class="fragment">Ermöglicht Test-Driven Development von Ansible Roles</p>
+          <p class="fragment"><em>Erstellt Docker Container, führt Role und Tests dort aus, und reißt Container wieder ab</em></p>
+        </section>
+
+        <section>
+          <h2>Ansible Pull</h2>
+          <p class="fragment">Invertiert die Ansible Architektur</p>
+          <p class="fragment">Node holt selbstständig Playbook ab und führt es aus</p>
+        </section>
+
+        <section>
+          <h2>Editor</h2>
+          <p>Visual Studio Code mit Ansible Plugin</p>
+        </section>
+
+      </section>
+
+      <section data-background-image="resources/Ansible-Mark-RGB_Outline-White.svg" data-background-size="60%"
+        data-background-opacity="0.05">
+        <section>
+        <h2 class="r-fit-text">NOW IT'S DEMO TIME!!!</h2>
+        </section>
+
+        <section>
+          <h2>Deploy & Bootstrap Node</h2>
+          <ul>
+            <li class="fragment">Deployeete & starte neuen Proxmox Container</li>
+            <li class="fragment">Konfiguriere SSH</li>
+            <li class="fragment">Installiere minimal benötigte Pakete</li>
+            <li class="fragment">Konfiguriere neuen `ansible`-User</li>
+            <li class="fragment">Konfiguriere regulären Useraccount</li>
+            <li class="fragment"><em>$zusätzliche_konfiguration</em></li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>„Poor man's CD-Pipeline”</h2>
+          <ul>
+            <li class="fragment">Installiere nginx</li>
+            <li class="fragment">Klone Git Repo</li>
+            <li class="fragment">Erstelle Webroot Ordner</li>
+            <li class="fragment">Konfiguriere nginx</li>
+            <li class="fragment">Deploye Dateien aus dem Git</li>
+          </ul>
+        </section>
+
+      </section>
+
+      <section data-background-image="resources/Ansible-Mark-RGB_Outline-White.svg" data-background-size="60%"
+        data-background-opacity="0.05">
+        <h2 class="r-fit-text">Fragen?</h2>
+      </section>
+
+      <section data-background-image="resources/Ansible-Mark-RGB_Outline-White.svg" data-background-size="60%"
+        data-background-opacity="0.05">
+        <h2>Ende!</h2>
+        <p>Vielen Dank, dass ihr da gewesen seid!</p>
+        <p>Wenn ihr sonst noch Fragen oder Feedback habt,
+          oder euch einfach über lustiges mit Ansible austauschen wollt:</p>
+        <a href="mailto:badgateway@das-labor.org">badgateway@das-labor.org</a>
+        <p>matrix: badgateway</p>
+      </section>
+
+		</div>
+	</div>
+
+	<script src="dist/reveal.js"></script>
+	<script src="plugin/notes/notes.js"></script>
+	<script src="plugin/markdown/markdown.js"></script>
+	<script src="plugin/highlight/highlight.js"></script>
+	<script>
+    // More info about initialization & config:
+    // - https://revealjs.com/initialization/
+    // - https://revealjs.com/config/
+    Reveal.initialize({
+      hash: true,
+      slideNumber: 'c/t',
+      pdfSeparateFragments: false,
+      // Learn about plugins: https://revealjs.com/plugins/
+      plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+    });
+  </script>
+</body>
+
+</html>
